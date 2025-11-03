@@ -1,2 +1,4 @@
 .venv
 main2.py
+*.pdf
+*.zip
