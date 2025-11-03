@@ -28,18 +28,42 @@ class KMeans:
         # your code
         pass
 
+    def random_int(self, range: int):
+        return np.random.randint(range)
+
     def initialize_centroids(self, X: np.ndarray):
         """
         Initialize centroids either randomly or using kmeans++ method of initialization.
         :param X:
         :return:
         """
+        k = self.n_clusters
+
         if self.init == "random":
-            # your code
-            pass
+            # select k data points randomly without replacement
+            self.centroids = X[
+                np.random.choice(range(X.shape[0]), replace=False, size=k)
+            ]
         elif self.init == "kmeans++":
-            # your code
-            pass
+            # choose first centroid randomly
+            self.centroids = X[
+                np.random.choice(range(X.shape[0]), replace=False, size=1)
+            ]
+
+            for i in range(1, k):
+                # find distance of each data point in X to each centroid
+                distances = self.euclidean_distance(X, self.centroids)
+                # find distance to nearest centroid for each data point in X
+                min_distances = np.min(distances, axis=1)
+                min_squared = np.square(min_distances)
+
+                # probability directly proportional to distance of nearest centroid
+                pdf = min_squared / np.sum(min_squared)
+
+                # choose next centroid based on this probability and add to our selected centroids
+                next_centroid = X[np.random.choice(range(X.shape[0]), p=pdf)]
+                self.centroids = np.vstack([self.centroids, next_centroid])
+
         else:
             raise ValueError(
                 'Centroid initialization method should either be "random" or "k-means++"'
@@ -53,9 +77,20 @@ class KMeans:
         :param X2:
         :return: Returns a matrix `dist` where `dist_ij` is the distance between row i in X1 and row j in X2.
         """
-        # your code
-        pass
+
+        """
+        (a - b)^2 = a^2 - 2ab + b^2
+        """
+        X1_sum_squared = np.sum(np.square(X1), axis=1, keepdims=True)
+        X2_sum_squared = np.sum(np.square(X2), axis=1, keepdims=True)
+
+        mul = np.dot(X1, X2.T)
+
+        dist_squared = X1_sum_squared - 2 * mul + X2_sum_squared.T
+
+        return np.sqrt(dist_squared)
 
     def silhouette(self, clustering: np.ndarray, X: np.ndarray):
         # your code
+
         pass
