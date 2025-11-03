@@ -1,9 +1,9 @@
 import numpy as np
 
 
-class KMeans():
+class KMeans:
 
-    def __init__(self, n_clusters: int, init: str='random', max_iter = 300):
+    def __init__(self, n_clusters: int, init: str = "random", max_iter=300):
         """
 
         :param n_clusters: number of clusters
@@ -13,7 +13,7 @@ class KMeans():
         self.n_clusters = n_clusters
         self.init = init
         self.max_iter = max_iter
-        self.centroids = None # Initialized in initialize_centroids()
+        self.centroids = None  # Initialized in initialize_centroids()
 
     def fit(self, X: np.ndarray):
         self.initialize_centroids(X)
@@ -21,10 +21,12 @@ class KMeans():
         clustering = np.zeros(X.shape[0])
         while iteration < self.max_iter:
             # your code
+            pass
         return clustering
 
     def update_centroids(self, clustering: np.ndarray, X: np.ndarray):
-        #your code
+        # your code
+        pass
 
     def initialize_centroids(self, X: np.ndarray):
         """
@@ -32,14 +34,18 @@ class KMeans():
         :param X:
         :return:
         """
-        if self.init == 'random':
+        if self.init == "random":
             # your code
-        elif self.init == 'kmeans++':
+            pass
+        elif self.init == "kmeans++":
             # your code
+            pass
         else:
-            raise ValueError('Centroid initialization method should either be "random" or "k-means++"')
+            raise ValueError(
+                'Centroid initialization method should either be "random" or "k-means++"'
+            )
 
-    def euclidean_distance(self, X1:np.ndarray, X2:np.ndarray):
+    def euclidean_distance(self, X1: np.ndarray, X2: np.ndarray):
         """
         Computes the euclidean distance between all pairs (x,y) where x is a row in X1 and y is a row in X2.
         Tip: Using vectorized operations can hugely improve the efficiency here.
@@ -48,6 +54,8 @@ class KMeans():
         :return: Returns a matrix `dist` where `dist_ij` is the distance between row i in X1 and row j in X2.
         """
         # your code
+        pass
 
     def silhouette(self, clustering: np.ndarray, X: np.ndarray):
         # your code
+        pass
