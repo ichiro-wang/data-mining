@@ -2,8 +2,10 @@ import numpy as np
 
 
 class KMeans:
+    random = "random"
+    pp = "kmeans++"
 
-    def __init__(self, n_clusters: int, init: str = "random", max_iter=300):
+    def __init__(self, n_clusters: int, init: str = random, max_iter=300):
         """
 
         :param n_clusters: number of clusters
@@ -61,12 +63,12 @@ class KMeans:
         """
         k = self.n_clusters
 
-        if self.init == "random":
+        if self.init == KMeans.random:
             # select k data points randomly without replacement
             self.centroids = X[
                 np.random.choice(range(X.shape[0]), replace=False, size=k)
             ]
-        elif self.init == "kmeans++":
+        elif self.init == KMeans.pp:
             # choose first centroid randomly
             self.centroids = X[
                 np.random.choice(range(X.shape[0]), replace=False, size=1)
