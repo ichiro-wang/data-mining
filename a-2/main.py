@@ -50,7 +50,6 @@ def main():
     heart = preprocess_data(heart)
     X = PCA(heart.X, 100)
     # Your code
-    pass
 
 
 def visualize_cluster(x, y, clustering):
