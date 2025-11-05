@@ -7,7 +7,6 @@ class KMeans:
 
     def __init__(self, n_clusters: int, init: str = random, max_iter=300):
         """
-
         :param n_clusters: number of clusters
         :param init: centroid initialization method. Should be either 'random' or 'kmeans++'
         :param max_iter: maximum number of iterations
@@ -24,29 +23,30 @@ class KMeans:
         old_clustering = clustering
 
         while iter < self.max_iter:
-            # find distance of each data point in X to each centroid
+            # assign a centroid to each data point
             distances = self.euclidean_distance(X, self.centroids)
-
             clustering = np.argmin(distances, axis=1)
-
             self.update_centroids(clustering, X)
 
+            # finish iterating if clustering doesn't change
             if np.array_equal(clustering, old_clustering):
                 break
 
             old_clustering = clustering.copy()
-
             iter += 1
 
         return clustering
 
     def update_centroids(self, clustering: np.ndarray, X: np.ndarray):
+        """
+        Update centroids to mean of each cluster
+        """
         k = self.n_clusters
         new_centroids = np.zeros((k, X.shape[1]))
 
-        # update each centroid
         for i in range(k):
             cluster_i = X[clustering == i]
+
             # make sure there are actually points assigned to this centroid
             if len(cluster_i) > 0:
                 new_centroids[i] = cluster_i.mean(axis=0)
@@ -59,7 +59,7 @@ class KMeans:
         """
         Initialize centroids either randomly or using kmeans++ method of initialization.
         :param X:
-        :return:
+        :return: None
         """
         k = self.n_clusters
 
@@ -70,9 +70,9 @@ class KMeans:
             ]
         elif self.init == KMeans.pp:
             # choose first centroid randomly
-            self.centroids = X[
-                np.random.choice(range(X.shape[0]), replace=False, size=1)
-            ]
+            first_index = int(np.random.choice(range(X.shape[0])))
+            selected_indices = [first_index]
+            self.centroids = X[first_index : first_index + 1]
 
             for i in range(1, k):
                 # find distance of each data point in X to each centroid
@@ -81,11 +81,17 @@ class KMeans:
                 min_distances = np.min(distances, axis=1)
                 min_squared = np.square(min_distances)
 
+                # make sure we dont pick same centroid multiple times
+                min_squared[selected_indices] = 0
+
                 # probability directly proportional to distance of nearest centroid
                 pdf = min_squared / np.sum(min_squared)
 
                 # choose next centroid based on this probability and add to our selected centroids
-                next_centroid = X[np.random.choice(range(X.shape[0]), p=pdf)]
+                next_index = np.random.choice(range(X.shape[0]), p=pdf)
+
+                selected_indices.append(next_index)
+                next_centroid = X[next_index]
                 self.centroids = np.vstack([self.centroids, next_centroid])
 
         else:
@@ -102,9 +108,7 @@ class KMeans:
         :return: Returns a matrix `dist` where `dist_ij` is the distance between row i in X1 and row j in X2.
         """
 
-        """
-        (a - b)^2 = a^2 - 2ab + b^2
-        """
+        # (a - b)^2 = a^2 - 2ab + b^2
         X1_sum_squared = np.sum(np.square(X1), axis=1, keepdims=True)
         X2_sum_squared = np.sum(np.square(X2), axis=1, keepdims=True)
 
@@ -112,9 +116,15 @@ class KMeans:
 
         dist_squared = X1_sum_squared - 2 * mul + X2_sum_squared.T
 
+        # to avoid negative values due to precision
+        dist_squared = np.maximum(dist_squared, 0)
+
         return np.sqrt(dist_squared)
 
     def silhouette(self, clustering: np.ndarray, X: np.ndarray):
+        """
+        s(o) = ( b(o) - a(o) ) / ( max( b(o), a(o) ) )
+        """
         distances = self.euclidean_distance(X, self.centroids)
 
         n = X.shape[0]
@@ -128,11 +138,9 @@ class KMeans:
 
             # find distance to 2nd closest cluster
             other_distances = distances[i].copy()
-            other_distances[closest_cluster] = (
-                np.inf
-            )  # we want to ignore the closest cluster
-            second_closest_cluster = np.argmin(other_distances)
-            b = distances[i, second_closest_cluster]
+            # we want to ignore the closest cluster to find next shortest distance
+            other_distances[closest_cluster] = np.inf
+            b = np.min(other_distances)
 
             silhouette_scores[i] = (b - a) / max(a, b)
 
