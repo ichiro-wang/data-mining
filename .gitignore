@@ -2,3 +2,5 @@
 main2.py
 *.pdf
 *.zip
+__pycache__
+report*
